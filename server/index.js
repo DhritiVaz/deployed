@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const applicationRoutes = require('./routes/applications');
+const uploadRoutes = require('./routes/upload');
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +11,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/applications', applicationRoutes);
+app.use('/api/upload', uploadRoutes);
+
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
