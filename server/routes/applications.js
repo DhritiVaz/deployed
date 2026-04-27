@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Application = require('../models/Application');
+const auth = require('../middleware/auth');
 
 // GET all applications for a user
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user.id;
     const applications = await Application.find({ userId }).sort({ createdAt: -1 });
     res.json(applications);
   } catch (err) {
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET single application
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const application = await Application.findById(req.params.id);
     if (!application) return res.status(404).json({ error: 'Not found' });
@@ -25,9 +26,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create new application
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
-    const application = new Application(req.body);
+    const application = new Application({ ...req.body, userId: req.user.id });
     await application.save();
     res.status(201).json(application);
   } catch (err) {
@@ -36,7 +37,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update application
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const application = await Application.findByIdAndUpdate(
       req.params.id,
@@ -51,7 +52,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE application
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     await Application.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted successfully' });
@@ -61,9 +62,9 @@ router.delete('/:id', async (req, res) => {
 });
 
 // GET dashboard stats
-router.get('/stats/dashboard', async (req, res) => {
+router.get('/stats/dashboard', auth, async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user.id;
     const total = await Application.countDocuments({ userId });
     const applied = await Application.countDocuments({ userId, status: 'applied' });
     const interview = await Application.countDocuments({ userId, status: 'interview' });
