@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const applicationRoutes = require('./routes/applications');
 require('dotenv').config();
 
 const app = express();
@@ -8,6 +9,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/api/applications', applicationRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
