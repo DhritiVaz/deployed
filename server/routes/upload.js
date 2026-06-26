@@ -7,7 +7,7 @@ const auth = require('../middleware/auth');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 // Store file in memory instead of disk
@@ -49,6 +49,7 @@ router.post('/', auth, upload.single('resume'), async (req, res) => {
       fileUrl: urlData.publicUrl
     });
   } catch (err) {
+    console.error('Upload error:', err);
     res.status(500).json({ error: err.message });
   }
 });
